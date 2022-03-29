@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Union
 
 import arabic_reshaper
-from hazm import Normalizer, word_tokenize
+from hazm import Normalizer
 from loguru import logger
 from src.data import DATA_DIR
 from wordcloud import WordCloud
@@ -26,7 +26,8 @@ class ChatStatistics:
 
         # load stopwords
         logger.info(f'loading stopwords from {DATA_DIR}/stopwords.txt')
-        stopwords = open(Path(DATA_DIR) / 'stopwords.txt').readlines()
+        with open(Path(DATA_DIR) / 'stopwords.txt') as f:
+            stopwords = f.readlines()
         stopwords = list(map(str.strip, stopwords))
         self.stopwords = list(map(self.normalizer.normalize, stopwords))
 
@@ -62,10 +63,7 @@ class ChatStatistics:
 
         # normalize, reshape for final word cloud
         text_content = arabic_reshaper.reshape(text_content)
-        tokens = word_tokenize(self.normalizer.normalize(text_content))
-        tokens = list(
-            filter(lambda item: item[0] not in self.stopwords, tokens)
-            )
+        text_content = self.normalizer.normalize(text_content)
 
         # generate word cloud
         logger.info('Generating word cloud...')
@@ -75,7 +73,9 @@ class ChatStatistics:
             max_font_size=max_font_size,
             font_path=str(DATA_DIR) +
             '/font/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf',
-            background_color=background_color).generate(' '.join(tokens))
+            background_color=background_color,
+            stopwords=self.stopwords
+            ).generate(text_content)
 
         logger.info(f'Saving word cloud to {output_dir}')
         word_cloud.to_file(str(output_dir)+'/wordcloud.png')
