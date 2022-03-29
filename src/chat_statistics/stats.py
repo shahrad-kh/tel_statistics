@@ -36,7 +36,8 @@ class ChatStatistics:
                             width=1200,
                             height=1200,
                             max_font_size=300,
-                            background_color='white'):
+                            background_color='white',
+                            stop_words=None):
         """generates a word cloud from the chat data
 
         Args:
@@ -64,6 +65,9 @@ class ChatStatistics:
         # normalize, reshape for final word cloud
         text_content = arabic_reshaper.reshape(text_content)
         text_content = self.normalizer.normalize(text_content)
+          
+        if(stop_words is None):
+            stop_words = self.stopwords
 
         # generate word cloud
         logger.info('Generating word cloud...')
@@ -74,7 +78,7 @@ class ChatStatistics:
             font_path=str(DATA_DIR) +
             '/font/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf',
             background_color=background_color,
-            stopwords=self.stopwords
+            stopwords=stop_words
             ).generate(text_content)
 
         logger.info(f'Saving word cloud to {output_dir}')
