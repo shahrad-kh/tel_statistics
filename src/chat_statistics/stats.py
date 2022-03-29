@@ -28,8 +28,8 @@ class ChatStatistics:
         logger.info(f'loading stopwords from {DATA_DIR}/stopwords.txt')
         with open(Path(DATA_DIR) / 'stopwords.txt') as f:
             stopwords = f.readlines()
-        stopwords = list(map(str.strip, stopwords))
-        self.stopwords = list(map(self.normalizer.normalize, stopwords))
+        stopwords = set(map(str.strip, stopwords))
+        self.stopwords = set(map(self.normalizer.normalize, stopwords))
 
     def generate_word_cloud(self,
                             output_dir: Union[str, Path],
